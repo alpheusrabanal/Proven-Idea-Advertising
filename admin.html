@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIA - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8eaed;
+            color: #1e3a5f;
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar background changed to #00307d (dark blue) */
+        .sidebar {
+            width: 280px;
+            background-color: #00307d;
+            color: white;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo-letter {
+            font-size: 32px;
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .logo-p { background-color: #e74c3c; }
+        .logo-i { background-color: #27ae60; }
+        .logo-a { background-color: #1e3a5f; }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .requests-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .request-item {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-info {
+            flex: 1;
+        }
+
+        .request-name {
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 4px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .request-meta {
+            font-size: 13px;
+            color: #64748b;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .request-service {
+            display: inline-block;
+            background-color: #e0e7ff;
+            color: #2563eb;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-text {
+            font-size: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1e3a5f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #1e3a5f;
+        }
+
+        .detail-group {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-group:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            color: #1e3a5f;
+            font-weight: 500;
+            word-break: break-word;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Action buttons now 3 columns x 2 rows layout */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 16px 20px; /* Increased button padding and font size for better accessibility */
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .btn-accept {
+            background-color: #16a34a;
+            color: white;
+        }
+
+        .btn-accept:hover {
+            background-color: #15803d;
+        }
+
+        .btn-reject {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background-color: #b91c1c;
+        }
+
+        .btn-progress {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-progress:hover {
+            background-color: #1e40af;
+        }
+
+        .btn-complete {
+            background-color: #7c3aed;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background-color: #6d28d9;
+        }
+
+        .btn-print {
+            background-color: #f1f5f9;
+            color: #1e3a5f;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-print:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-back {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background-color: #7f8c8d;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .status-new {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-accepted {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-progress {
+            background-color: #bfdbfe;
+            color: #1e3a5f;
+        }
+
+        .status-completed {
+            background-color: #e9d5ff;
+            color: #6b21a8;
+        }
+
+        .status-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+
+            .main-content {
+                margin-left: 240px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .action-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-letter logo-p">P</div>
+                <div class="logo-letter logo-i">I</div>
+                <div class="logo-letter logo-a">A</div>
+            </div>
+            <div class="nav-item active" onclick="showTab('new')">
+                <span>✉️</span> New
+            </div>
+            <div class="nav-item" onclick="showTab('accepted')">
+                <span>✅</span> Accepted
+            </div>
+            <div class="nav-item" onclick="showTab('progress')">
+                <span>⚙️</span> In Progress
+            </div>
+            <div class="nav-item" onclick="showTab('completed')">
+                <span>🎉</span> Completed
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>Admin Dashboard</h1>
+            </div>
+
+            <div class="requests-container" id="requestsContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-text">No requests yet. Sit back and wait for submissions!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Request Details</span>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'new';
+        let requests = [];
+        let selectedRequestId = null;
+
+        function loadRequests() {
+            requests = JSON.parse(localStorage.getItem('advertisingRequests')) || [];
+            renderRequests();
+        }
+
+        function getFilteredRequests() {
+            const statusMap = {
+                'new': 'New',
+                'accepted': 'Accepted',
+                'progress': 'In Progress',
+                'completed': 'Completed'
+            };
+            return requests.filter(r => r.status === statusMap[currentTab]);
+        }
+
+        function renderRequests() {
+            const container = document.getElementById('requestsContainer');
+            const filtered = getFilteredRequests();
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">No requests in this category yet.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((req, index) => `
+                <div class="request-item" onclick="viewDetails(${requests.indexOf(req)})">
+                    <div class="request-info">
+                        <div class="request-name">${req.client_name}</div>
+                        <div class="request-meta">
+                            ${req.company_name} • ${new Date(req.submission_date).toLocaleDateString()}
+                            <span class="request-service">${req.service_type}</span>
+                        </div>
+                    </div>
+                    <div class="status-badge status-${req.status.toLowerCase().replace(' ', '-')}">${req.status}</div>
+                </div>
+            `).join('');
+        }
+
+        function showTab(tab) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.nav-item[onclick="showTab('${tab}')"]`).classList.add('active');
+            
+            renderRequests();
+        }
+
+        function viewDetails(index) {
+            selectedRequestId = index;
+            const req = requests[index];
+            const detailContent = document.getElementById('detailContent');
+            const dateObj = new Date(req.date_needed);
+            const formattedDate = dateObj.toLocaleString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            detailContent.innerHTML = `
+                <div class="detail-group">
+                    <div class="detail-label">Status</div>
+                    <div><span class="status-badge status-${req.status.toLowerCase().replace(' ', '-')}">${req.status}</span></div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Client Name</div>
+                    <div class="detail-value">${req.client_name}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Email Address</div>
+                    <div class="detail-value">${req.email}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Contact Number</div>
+                    <div class="detail-value">${req.contact_number}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Company Name</div>
+                    <div class="detail-value">${req.company_name}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Service Type</div>
+                    <div class="detail-value">${req.service_type}</div>
+                </div>
+                ${req.size_dimensions ? `
+                <div class="detail-group">
+                    <div class="detail-label">Size Dimensions</div>
+                    <div class="detail-value">${req.size_dimensions}</div>
+                </div>
+                ` : ''}
+                ${req.other_service ? `
+                <div class="detail-group">
+                    <div class="detail-label">Other Service</div>
+                    <div class="detail-value">${req.other_service}</div>
+                </div>
+                ` : ''}
+                <div class="detail-group">
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">${req.location}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Date Needed</div>
+                    <div class="detail-value">${formattedDate}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Budget</div>
+                    <div class="detail-value">${req.budget}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Files Uploaded</div>
+                    <div class="detail-value">${req.uploaded_files ? req.uploaded_files.join(', ') : 'None'}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Project Description</div>
+                    <div class="detail-value">${req.project_description}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Submitted At</div>
+                    <div class="detail-value">${req.submission_date}</div>
+                </div>
+                <!-- Buttons arranged in 3x2 grid: Accept/Reject/Print on first row, In Progress/Completed/Back on second row -->
+                <div class="action-buttons">
+                    <button class="btn btn-accept" onclick="updateStatus('Accepted')">Accept</button>
+                    <button class="btn btn-reject" onclick="updateStatus('Rejected')">Reject</button>
+                    <button class="btn btn-print" onclick="window.print()">Print</button>
+                    <button class="btn btn-progress" onclick="updateStatus('In Progress')">In Progress</button>
+                    <button class="btn btn-complete" onclick="updateStatus('Completed')">Completed</button>
+                    <button class="btn btn-back" onclick="closeModal()">Back</button>
+                </div>
+            `;
+            
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        /* Status buttons now automatically close modal and return to list */
+        function updateStatus(newStatus) {
+            if (selectedRequestId !== null) {
+                requests[selectedRequestId].status = newStatus;
+                localStorage.setItem('advertisingRequests', JSON.stringify(requests));
+                closeModal();
+                loadRequests();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            selectedRequestId = null;
+        }
+
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') {
+                closeModal();
+            }
+        });
+
+        loadRequests();
+        
+        setInterval(() => {
+            loadRequests();
+        }, 1000);
+    </script>
+</body>
+</html>

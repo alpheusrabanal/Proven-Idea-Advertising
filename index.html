@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertising Request Form - PIA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8eaed;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .logo-letter {
+            font-size: 32px;
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .logo-p { background-color: #e74c3c; }
+        .logo-i { background-color: #27ae60; }
+        .logo-a { background-color: #1e3a5f; }
+
+        .header h1 {
+            color: #1e3a5f;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row-full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="datetime-local"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="datetime-local"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 180px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .upload-area {
+            border: 2px dashed #1e3a5f;
+            border-radius: 6px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f9fafb;
+            transition: background-color 0.3s;
+        }
+
+        .upload-area:hover {
+            background-color: #f0f4f8;
+        }
+
+        .upload-area.drag-over {
+            background-color: #e3f2fd;
+            border-color: #1e3a5f;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .upload-button {
+            background-color: #1e3a5f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .upload-button:hover {
+            background-color: #153049;
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            background-color: #f5f7fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .remove-file {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .remove-file:hover {
+            background-color: #c0392b;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: #1e3a5f;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .submit-btn:hover {
+            background-color: #153049;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+        }
+
+        .modal h2 {
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .summary-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .summary-value {
+            color: #666;
+            margin-top: 5px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .modal-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .confirm-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            background-color: #1e8449;
+        }
+
+        .edit-btn {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #7f8c8d;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-letter logo-p">P</div>
+                <div class="logo-letter logo-i">I</div>
+                <div class="logo-letter logo-a">A</div>
+            </div>
+            <h1>Advertising Request Form</h1>
+            <p>Submit your advertising project details</p>
+        </div>
+
+        <div id="successMessage" class="success-message hidden">
+            ✓ Request submitted successfully!
+        </div>
+
+        <div class="form-container">
+            <form id="advertisingForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="client_name">Client Name *</label>
+                        <input type="text" id="client_name" name="client_name" placeholder="Full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" placeholder="example@email.com" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contact_number">Contact Number *</label>
+                        <input type="tel" id="contact_number" name="contact_number" placeholder="09XXXXXXXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company_name">Company Name *</label>
+                        <input type="text" id="company_name" name="company_name" placeholder="Your company" required>
+                    </div>
+                </div>
+
+                <div class="form-group form-row-full">
+                    <label for="service_type">Select a Service *</label>
+                    <select id="service_type" name="service_type" required>
+                        <option value="">-- Choose a service --</option>
+                        <option value="Billboards">Billboards</option>
+                        <option value="Brochures">Brochures</option>
+                        <option value="Posters">Posters</option>
+                        <option value="Flyers">Flyers</option>
+                        <option value="Banners">Banners</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Size Dimensions and Other Service fields now full width to match Location field -->
+                <div class="form-group form-row-full" id="sizeDimensionsContainer" style="display: none;">
+                    <label for="size_dimensions">Size Dimensions *</label>
+                    <input type="text" id="size_dimensions" name="size_dimensions" placeholder="e.g., 40 ft x 40 ft">
+                </div>
+
+                <div class="form-group form-row-full" id="otherServiceContainer" style="display: none;">
+                    <label for="other_service">Other Service *</label>
+                    <input type="text" id="other_service" name="other_service" placeholder="Specify what type advertisement service you want e.g., Wedding invitations, Video, Web ad, etc.">
+                </div>
+
+                <div class="form-group form-row-full">
+                    <label for="location">Location *</label>
+                    <input type="text" id="location" name="location" placeholder="Where should the advertisement product be sent to?" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date_needed">Date Needed *</label>
+                        <input type="datetime-local" id="date_needed" name="date_needed" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="budget">Budget *</label>
+                        <input type="text" id="budget" name="budget" placeholder="e.g., 50,000 PHP" required>
+                    </div>
+                </div>
+
+                <div class="form-group form-row-full">
+                    <label for="upload_references">Upload References *</label>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-text">e.g., Logos, Fonts, Slogans, etc.</div>
+                        <button type="button" class="upload-button">Choose Files</button>
+                        <input type="file" id="fileInput" class="hidden-file-input" multiple>
+                        <div class="file-list" id="fileList"></div>
+                    </div>
+                </div>
+
+                <!-- Updated Project Description placeholder -->
+                <div class="form-group form-row-full">
+                    <label for="project_description">Project Description *</label>
+                    <textarea id="project_description" name="project_description" placeholder="Describe your desired advertisement project in absolute detail..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Request Summary</h2>
+            <div id="summaryContent"></div>
+            <div class="modal-buttons">
+                <button class="modal-button confirm-btn" onclick="confirmSubmit()">Confirm</button>
+                <button class="modal-button edit-btn" onclick="closeModal()">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('advertisingForm');
+        const serviceTypeSelect = document.getElementById('service_type');
+        const sizeDimensionsContainer = document.getElementById('sizeDimensionsContainer');
+        const otherServiceContainer = document.getElementById('otherServiceContainer');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        let uploadedFiles = [];
+
+        serviceTypeSelect.addEventListener('change', function() {
+            const printServices = ['Billboards', 'Brochures', 'Posters', 'Flyers', 'Banners'];
+            const isOther = this.value === 'Other';
+            const isPrintService = printServices.includes(this.value);
+
+            sizeDimensionsContainer.style.display = isPrintService ? 'block' : 'none';
+            otherServiceContainer.style.display = isOther ? 'block' : 'none';
+            
+            if (isPrintService) {
+                document.getElementById('size_dimensions').required = true;
+                document.getElementById('other_service').required = false;
+            } else if (isOther) {
+                document.getElementById('other_service').required = true;
+                document.getElementById('size_dimensions').required = false;
+            }
+        });
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            for (let file of files) {
+                uploadedFiles.push(file);
+                addFileToList(file.name, uploadedFiles.length - 1);
+            }
+        }
+
+        function addFileToList(fileName, index) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <span>${fileName}</span>
+                <button type="button" class="remove-file" onclick="removeFile(${index})">Remove</button>
+            `;
+            fileList.appendChild(fileItem);
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            fileList.innerHTML = '';
+            uploadedFiles.forEach((file, i) => addFileToList(file.name, i));
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (uploadedFiles.length === 0) {
+                alert('Please upload at least one file');
+                return;
+            }
+
+            const formData = {
+                client_name: document.getElementById('client_name').value,
+                email: document.getElementById('email').value,
+                contact_number: document.getElementById('contact_number').value,
+                company_name: document.getElementById('company_name').value,
+                service_type: document.getElementById('service_type').value,
+                size_dimensions: document.getElementById('size_dimensions').value || '',
+                other_service: document.getElementById('other_service').value || '',
+                location: document.getElementById('location').value,
+                date_needed: document.getElementById('date_needed').value,
+                budget: document.getElementById('budget').value,
+                project_description: document.getElementById('project_description').value,
+                uploaded_files: uploadedFiles.map(f => f.name),
+                status: 'New',
+                submission_date: new Date().toLocaleString()
+            };
+
+            showConfirmationModal(formData);
+        });
+
+        function showConfirmationModal(data) {
+            const summaryContent = document.getElementById('summaryContent');
+            let html = '';
+
+            const fields = [
+                { label: 'Client Name', key: 'client_name' },
+                { label: 'Email', key: 'email' },
+                { label: 'Contact Number', key: 'contact_number' },
+                { label: 'Company Name', key: 'company_name' },
+                { label: 'Service Type', key: 'service_type' },
+                { label: 'Size Dimensions', key: 'size_dimensions', condition: data.size_dimensions },
+                { label: 'Other Service', key: 'other_service', condition: data.other_service },
+                { label: 'Location', key: 'location' },
+                { label: 'Date Needed', key: 'date_needed' },
+                { label: 'Budget', key: 'budget' },
+                { label: 'Project Description', key: 'project_description' },
+                { label: 'Files', key: 'uploaded_files', isArray: true }
+            ];
+
+            fields.forEach(field => {
+                if (field.condition === false) return;
+                if (field.isArray) {
+                    html += `
+                        <div class="summary-item">
+                            <div class="summary-label">${field.label}</div>
+                            <div class="summary-value">${data[field.key].join(', ')}</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="summary-item">
+                            <div class="summary-label">${field.label}</div>
+                            <div class="summary-value">${data[field.key]}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            summaryContent.innerHTML = html;
+            document.getElementById('confirmationModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmationModal').classList.remove('show');
+        }
+
+        function confirmSubmit() {
+            const formData = {
+                client_name: document.getElementById('client_name').value,
+                email: document.getElementById('email').value,
+                contact_number: document.getElementById('contact_number').value,
+                company_name: document.getElementById('company_name').value,
+                service_type: document.getElementById('service_type').value,
+                size_dimensions: document.getElementById('size_dimensions').value || '',
+                other_service: document.getElementById('other_service').value || '',
+                location: document.getElementById('location').value,
+                date_needed: document.getElementById('date_needed').value,
+                budget: document.getElementById('budget').value,
+                project_description: document.getElementById('project_description').value,
+                uploaded_files: uploadedFiles.map(f => f.name),
+                status: 'New',
+                submission_date: new Date().toLocaleString()
+            };
+
+            let requests = JSON.parse(localStorage.getItem('advertisingRequests')) || [];
+            requests.push(formData);
+            localStorage.setItem('advertisingRequests', JSON.stringify(requests));
+
+            closeModal();
+            document.getElementById('successMessage').classList.remove('hidden');
+            form.reset();
+            uploadedFiles = [];
+            fileList.innerHTML = '';
+            sizeDimensionsContainer.style.display = 'none';
+            otherServiceContainer.style.display = 'none';
+
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
