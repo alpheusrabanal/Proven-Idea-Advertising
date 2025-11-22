@@ -427,6 +427,9 @@
             <div class="nav-item" onclick="showTab('completed')">
                 <span>🎉</span> Completed
             </div>
+            <div class="nav-item" onclick="showTab('rejected')">
+                <span>❌</span> Rejected
+            </div>
         </div>
 
         <div class="main-content">
@@ -459,17 +462,24 @@
         let selectedRequestId = null;
 
         function loadRequests() {
-            requests = JSON.parse(localStorage.getItem('advertisingRequests')) || [];
+            fetch("load_requests.php")
+            .then(res => res.json())
+            .then(data => {
+            requests = data;
             renderRequests();
+            });
         }
+
 
         function getFilteredRequests() {
             const statusMap = {
                 'new': 'New',
                 'accepted': 'Accepted',
                 'progress': 'In Progress',
-                'completed': 'Completed'
+                'completed': 'Completed',
+                'rejected': 'Rejected'
             };
+
             return requests.filter(r => r.status === statusMap[currentTab]);
         }
 
@@ -511,8 +521,9 @@
         }
 
         function viewDetails(index) {
-            selectedRequestId = index;
-            const req = requests[index];
+            const req = requests[index];   // first define req
+            selectedRequestId = req.id;    // now you can safely use req.id
+
             const detailContent = document.getElementById('detailContent');
             const dateObj = new Date(req.date_needed);
             const formattedDate = dateObj.toLocaleString('en-US', { 
@@ -550,7 +561,7 @@
                 </div>
                 ${req.size_dimensions ? `
                 <div class="detail-group">
-                    <div class="detail-label">Size Dimensions</div>
+            <div class="detail-label">Size Dimensions</div>
                     <div class="detail-value">${req.size_dimensions}</div>
                 </div>
                 ` : ''}
@@ -574,7 +585,7 @@
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Files Uploaded</div>
-                    <div class="detail-value">${req.uploaded_files ? req.uploaded_files.join(', ') : 'None'}</div>
+                    <div class="detail-value">${req.uploaded_files ? req.uploaded_files : 'None'}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Project Description</div>
@@ -584,7 +595,6 @@
                     <div class="detail-label">Submitted At</div>
                     <div class="detail-value">${req.submission_date}</div>
                 </div>
-                <!-- Buttons arranged in 3x2 grid: Accept/Reject/Print on first row, In Progress/Completed/Back on second row -->
                 <div class="action-buttons">
                     <button class="btn btn-accept" onclick="updateStatus('Accepted')">Accept</button>
                     <button class="btn btn-reject" onclick="updateStatus('Rejected')">Reject</button>
@@ -594,19 +604,33 @@
                     <button class="btn btn-back" onclick="closeModal()">Back</button>
                 </div>
             `;
-            
+    
             document.getElementById('detailModal').classList.add('active');
         }
+
 
         /* Status buttons now automatically close modal and return to list */
         function updateStatus(newStatus) {
             if (selectedRequestId !== null) {
-                requests[selectedRequestId].status = newStatus;
-                localStorage.setItem('advertisingRequests', JSON.stringify(requests));
-                closeModal();
-                loadRequests();
+
+                fetch("update_status.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        id: selectedRequestId,
+                        status: newStatus
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        closeModal();
+                        loadRequests(); // reload updated JSON
+                    }
+                });
             }
         }
+
 
         function closeModal() {
             document.getElementById('detailModal').classList.remove('active');
@@ -621,9 +645,8 @@
 
         loadRequests();
         
-        setInterval(() => {
-            loadRequests();
-        }, 1000);
+        setInterval(loadRequests, 5000); // every 5 seconds
+
     </script>
 </body>
 </html>

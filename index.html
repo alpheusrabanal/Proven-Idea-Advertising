@@ -368,7 +368,7 @@
         </div>
 
         <div class="form-container">
-            <form id="advertisingForm">
+            <form id="advertisingForm" method="POST" action="saverequest.php" enctype="multipart/form-data">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="client_name">Client Name *</label>
@@ -534,34 +534,6 @@
             uploadedFiles.forEach((file, i) => addFileToList(file.name, i));
         }
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            if (uploadedFiles.length === 0) {
-                alert('Please upload at least one file');
-                return;
-            }
-
-            const formData = {
-                client_name: document.getElementById('client_name').value,
-                email: document.getElementById('email').value,
-                contact_number: document.getElementById('contact_number').value,
-                company_name: document.getElementById('company_name').value,
-                service_type: document.getElementById('service_type').value,
-                size_dimensions: document.getElementById('size_dimensions').value || '',
-                other_service: document.getElementById('other_service').value || '',
-                location: document.getElementById('location').value,
-                date_needed: document.getElementById('date_needed').value,
-                budget: document.getElementById('budget').value,
-                project_description: document.getElementById('project_description').value,
-                uploaded_files: uploadedFiles.map(f => f.name),
-                status: 'New',
-                submission_date: new Date().toLocaleString()
-            };
-
-            showConfirmationModal(formData);
-        });
-
         function showConfirmationModal(data) {
             const summaryContent = document.getElementById('summaryContent');
             let html = '';
@@ -626,22 +598,24 @@
                 submission_date: new Date().toLocaleString()
             };
 
-            let requests = JSON.parse(localStorage.getItem('advertisingRequests')) || [];
-            requests.push(formData);
-            localStorage.setItem('advertisingRequests', JSON.stringify(requests));
-
-            closeModal();
-            document.getElementById('successMessage').classList.remove('hidden');
-            form.reset();
-            uploadedFiles = [];
-            fileList.innerHTML = '';
-            sizeDimensionsContainer.style.display = 'none';
-            otherServiceContainer.style.display = 'none';
-
-            setTimeout(() => {
-                document.getElementById('successMessage').classList.add('hidden');
-            }, 3000);
-        }
-    </script>
+            fetch("save_request.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(data => {
+            if (data.success) {
+                closeModal();
+                document.getElementById('successMessage').classList.remove('hidden');
+                form.reset();
+                uploadedFiles = [];
+                fileList.innerHTML = '';
+                sizeDimensionsContainer.style.display = 'none';
+                otherServiceContainer.style.display = 'none';
+            }
+        });
+    }
+</script>
 </body>
 </html>
