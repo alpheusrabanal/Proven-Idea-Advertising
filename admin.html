@@ -23,7 +23,6 @@
             min-height: 100vh;
         }
 
-        /* Sidebar background changed to #00307d (dark blue) */
         .sidebar {
             width: 280px;
             background-color: #00307d;
@@ -254,7 +253,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Action buttons now 3 columns x 2 rows layout */
         .action-buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -265,7 +263,7 @@
         }
 
         .btn {
-            padding: 16px 20px; /* Increased button padding and font size for better accessibility */
+            padding: 16px 20px;
             border: none;
             border-radius: 6px;
             font-size: 14px;
@@ -415,16 +413,16 @@
                 <div class="logo-letter logo-i">I</div>
                 <div class="logo-letter logo-a">A</div>
             </div>
-            <div class="nav-item active" onclick="showTab('new')">
+            <div class="nav-item active" onclick="showTab('New')">
                 <span>✉️</span> New
             </div>
-            <div class="nav-item" onclick="showTab('accepted')">
+            <div class="nav-item" onclick="showTab('Accepted')">
                 <span>✅</span> Accepted
             </div>
-            <div class="nav-item" onclick="showTab('progress')">
+            <div class="nav-item" onclick="showTab('In Progress')">
                 <span>⚙️</span> In Progress
             </div>
-            <div class="nav-item" onclick="showTab('completed')">
+            <div class="nav-item" onclick="showTab('Completed')">
                 <span>🎉</span> Completed
             </div>
         </div>
@@ -454,23 +452,26 @@
     </div>
 
     <script>
-        let currentTab = 'new';
+        let currentTab = 'New';
         let requests = [];
         let selectedRequestId = null;
 
         function loadRequests() {
-            requests = JSON.parse(localStorage.getItem('advertisingRequests')) || [];
-            renderRequests();
+            fetch('api/get-requests.php')
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    requests = data;
+                    renderRequests();
+                } else {
+                    console.error('Invalid data format:', data);
+                }
+            })
+            .catch(error => console.error('Error loading requests:', error));
         }
 
         function getFilteredRequests() {
-            const statusMap = {
-                'new': 'New',
-                'accepted': 'Accepted',
-                'progress': 'In Progress',
-                'completed': 'Completed'
-            };
-            return requests.filter(r => r.status === statusMap[currentTab]);
+            return requests.filter(r => r.status === currentTab);
         }
 
         function renderRequests() {
@@ -487,12 +488,12 @@
                 return;
             }
 
-            container.innerHTML = filtered.map((req, index) => `
-                <div class="request-item" onclick="viewDetails(${requests.indexOf(req)})">
+            container.innerHTML = filtered.map((req) => `
+                <div class="request-item" onclick="viewDetails(${req.id})">
                     <div class="request-info">
                         <div class="request-name">${req.client_name}</div>
                         <div class="request-meta">
-                            ${req.company_name} • ${new Date(req.submission_date).toLocaleDateString()}
+                            ${req.company_name} • ${new Date(req.created_at).toLocaleDateString()}
                             <span class="request-service">${req.service_type}</span>
                         </div>
                     </div>
@@ -510,9 +511,11 @@
             renderRequests();
         }
 
-        function viewDetails(index) {
-            selectedRequestId = index;
-            const req = requests[index];
+        function viewDetails(id) {
+            const req = requests.find(r => r.id === id);
+            if (!req) return;
+
+            selectedRequestId = id;
             const detailContent = document.getElementById('detailContent');
             const dateObj = new Date(req.date_needed);
             const formattedDate = dateObj.toLocaleString('en-US', { 
@@ -574,7 +577,7 @@
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Files Uploaded</div>
-                    <div class="detail-value">${req.uploaded_files ? req.uploaded_files.join(', ') : 'None'}</div>
+                    <div class="detail-value">${req.upload_files || 'None'}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Project Description</div>
@@ -582,9 +585,8 @@
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Submitted At</div>
-                    <div class="detail-value">${req.submission_date}</div>
+                    <div class="detail-value">${req.created_at}</div>
                 </div>
-                <!-- Buttons arranged in 3x2 grid: Accept/Reject/Print on first row, In Progress/Completed/Back on second row -->
                 <div class="action-buttons">
                     <button class="btn btn-accept" onclick="updateStatus('Accepted')">Accept</button>
                     <button class="btn btn-reject" onclick="updateStatus('Rejected')">Reject</button>
@@ -598,13 +600,31 @@
             document.getElementById('detailModal').classList.add('active');
         }
 
-        /* Status buttons now automatically close modal and return to list */
         function updateStatus(newStatus) {
             if (selectedRequestId !== null) {
-                requests[selectedRequestId].status = newStatus;
-                localStorage.setItem('advertisingRequests', JSON.stringify(requests));
-                closeModal();
-                loadRequests();
+                fetch('api/update-status.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: selectedRequestId,
+                        status: newStatus
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        closeModal();
+                        loadRequests();
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating status: ' + error.message);
+                });
             }
         }
 
@@ -621,9 +641,7 @@
 
         loadRequests();
         
-        setInterval(() => {
-            loadRequests();
-        }, 1000);
+        setInterval(loadRequests, 1000);
     </script>
 </body>
 </html>
