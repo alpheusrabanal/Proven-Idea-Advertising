@@ -404,7 +404,6 @@
                     </select>
                 </div>
 
-                <!-- Size Dimensions and Other Service fields now full width to match Location field -->
                 <div class="form-group form-row-full" id="sizeDimensionsContainer" style="display: none;">
                     <label for="size_dimensions">Size Dimensions *</label>
                     <input type="text" id="size_dimensions" name="size_dimensions" placeholder="e.g., 40 ft x 40 ft">
@@ -441,7 +440,6 @@
                     </div>
                 </div>
 
-                <!-- Updated Project Description placeholder -->
                 <div class="form-group form-row-full">
                     <label for="project_description">Project Description *</label>
                     <textarea id="project_description" name="project_description" placeholder="Describe your desired advertisement project in absolute detail..." required></textarea>
@@ -554,9 +552,7 @@
                 date_needed: document.getElementById('date_needed').value,
                 budget: document.getElementById('budget').value,
                 project_description: document.getElementById('project_description').value,
-                uploaded_files: uploadedFiles.map(f => f.name),
-                status: 'New',
-                submission_date: new Date().toLocaleString()
+                upload_files: uploadedFiles.map(f => f.name).join(', ')
             };
 
             showConfirmationModal(formData);
@@ -578,34 +574,22 @@
                 { label: 'Date Needed', key: 'date_needed' },
                 { label: 'Budget', key: 'budget' },
                 { label: 'Project Description', key: 'project_description' },
-                { label: 'Files', key: 'uploaded_files', isArray: true }
+                { label: 'Files', key: 'upload_files' }
             ];
 
             fields.forEach(field => {
                 if (field.condition === false) return;
-                if (field.isArray) {
-                    html += `
-                        <div class="summary-item">
-                            <div class="summary-label">${field.label}</div>
-                            <div class="summary-value">${data[field.key].join(', ')}</div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="summary-item">
-                            <div class="summary-label">${field.label}</div>
-                            <div class="summary-value">${data[field.key]}</div>
-                        </div>
-                    `;
-                }
+
+                html += `
+                    <div class="summary-item">
+                        <div class="summary-label">${field.label}</div>
+                        <div class="summary-value">${data[field.key] || 'N/A'}</div>
+                    </div>
+                `;
             });
 
             summaryContent.innerHTML = html;
             document.getElementById('confirmationModal').classList.add('show');
-        }
-
-        function closeModal() {
-            document.getElementById('confirmationModal').classList.remove('show');
         }
 
         function confirmSubmit() {
@@ -621,27 +605,47 @@
                 date_needed: document.getElementById('date_needed').value,
                 budget: document.getElementById('budget').value,
                 project_description: document.getElementById('project_description').value,
-                uploaded_files: uploadedFiles.map(f => f.name),
-                status: 'New',
-                submission_date: new Date().toLocaleString()
+                upload_files: uploadedFiles.map(f => f.name).join(', ')
             };
 
-            let requests = JSON.parse(localStorage.getItem('advertisingRequests')) || [];
-            requests.push(formData);
-            localStorage.setItem('advertisingRequests', JSON.stringify(requests));
-
-            closeModal();
-            document.getElementById('successMessage').classList.remove('hidden');
-            form.reset();
-            uploadedFiles = [];
-            fileList.innerHTML = '';
-            sizeDimensionsContainer.style.display = 'none';
-            otherServiceContainer.style.display = 'none';
-
-            setTimeout(() => {
-                document.getElementById('successMessage').classList.add('hidden');
-            }, 3000);
+            fetch('api/submit-request.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('successMessage').classList.remove('hidden');
+                    form.reset();
+                    uploadedFiles = [];
+                    fileList.innerHTML = '';
+                    closeModal();
+                    
+                    setTimeout(() => {
+                        document.getElementById('successMessage').classList.add('hidden');
+                    }, 3000);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting request: ' + error.message);
+            });
         }
+
+        function closeModal() {
+            document.getElementById('confirmationModal').classList.remove('show');
+        }
+
+        document.getElementById('confirmationModal').addEventListener('click', (e) => {
+            if (e.target.id === 'confirmationModal') {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
