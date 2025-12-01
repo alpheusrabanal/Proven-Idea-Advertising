@@ -340,6 +340,130 @@
             display: none !important;
         }
 
+        .login-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #1e3a5f;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            z-index: 999;
+        }
+
+        .login-btn:hover {
+            background-color: #153049;
+        }
+
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-modal.show {
+            display: flex;
+        }
+
+        .login-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 350px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+        }
+
+        .login-modal-content h2 {
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 22px;
+        }
+
+        .login-form-group {
+            margin-bottom: 15px;
+        }
+
+        .login-form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #1e3a5f;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-form-group input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-bottom: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .login-button {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-submit-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .login-submit-btn:hover {
+            background-color: #1e8449;
+        }
+
+        .close-btn {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .close-btn:hover {
+            background-color: #7f8c8d;
+        }
+
         @media (max-width: 600px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -347,6 +471,11 @@
 
             .modal-buttons {
                 grid-template-columns: 1fr;
+            }
+
+            .login-btn {
+                padding: 8px 12px;
+                font-size: 12px;
             }
         }
     </style>
@@ -447,6 +576,27 @@
 
                 <button type="submit" class="submit-btn">Submit Request</button>
             </form>
+        </div>
+    </div>
+
+    <button class="login-btn" onclick="openLoginModal()">Login as Admin</button>
+
+    <div id="loginModal" class="login-modal">
+        <div class="login-modal-content">
+            <h2>Admin Login</h2>
+            <div id="errorMessage" class="error-message"></div>
+            <div class="login-form-group">
+                <label for="admin_username">Username</label>
+                <input type="text" id="admin_username" placeholder="Enter username">
+            </div>
+            <div class="login-form-group">
+                <label for="admin_password">Password</label>
+                <input type="password" id="admin_password" placeholder="Enter password">
+            </div>
+            <div class="login-buttons">
+                <button class="login-button login-submit-btn" onclick="adminLogin()">Login</button>
+                <button class="login-button close-btn" onclick="closeLoginModal()">Close</button>
+            </div>
         </div>
     </div>
 
@@ -644,6 +794,43 @@
         document.getElementById('confirmationModal').addEventListener('click', (e) => {
             if (e.target.id === 'confirmationModal') {
                 closeModal();
+            }
+        });
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+            document.getElementById('errorMessage').innerHTML = '';
+            document.getElementById('admin_username').value = '';
+            document.getElementById('admin_password').value = '';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+            document.getElementById('errorMessage').innerHTML = '';
+        }
+
+        function adminLogin() {
+            const username = document.getElementById('admin_username').value;
+            const password = document.getElementById('admin_password').value;
+            const correctUsername = 'admin';
+            const correctPassword = '845693127';
+
+            if (username === correctUsername && password === correctPassword) {
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('errorMessage').innerHTML = 'Wrong credentials';
+            }
+        }
+
+        document.getElementById('loginModal').addEventListener('click', (e) => {
+            if (e.target.id === 'loginModal') {
+                closeLoginModal();
+            }
+        });
+
+        document.getElementById('admin_password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                adminLogin();
             }
         });
     </script>
